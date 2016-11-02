@@ -1,0 +1,16 @@
+==========
+ izaber.wamp
+==========
+
+Overview
+========
+Base module that brings together most of the requirements to allow WAMP
+connectivity within Zaber
+
+Documentation
+=============
+API documentation, usage and examples can be found in the "docs" directory.
+
+Installation
+============
+The usual setup.py for Python libraries is used for the source distribution.
