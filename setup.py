@@ -5,7 +5,7 @@ from setuptools import setup
 import izaber
 
 setup(name='izaber_wamp',
-      version=izaber.__version__,
+      version='1.00',
       description='Base load point for iZaber WAMP code',
       url='',
       author='Aki Mimoto',
