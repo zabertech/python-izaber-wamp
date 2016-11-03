@@ -2,8 +2,6 @@
 
 from setuptools import setup
 
-import izaber
-
 setup(name='izaber_wamp',
       version='1.00',
       description='Base load point for iZaber WAMP code',
