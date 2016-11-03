@@ -13,6 +13,8 @@ setup(name='izaber_wamp',
       scripts=[],
       install_requires=[
           'izaber',
+          'autobahn_sync',
+          'service_identity',
       ],
       dependency_links=[
           'git+https://gitlab.izaber.com/systems/izaber.git#egg=izaber-1.0.0'
