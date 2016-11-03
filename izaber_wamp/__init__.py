@@ -56,11 +56,16 @@ class WAMP(object):
                 )
         return self
 
+    def __getattr__(self,k):
+        if not k in ('call','leave','publish','register','subscribe'):
+            raise AttributeError("'WAMP' object has no attribute '{}'".format(k))
+        fn = getattr(self.wamp.session,k)
+        return lambda uri, *a, **kw: fn(
+                        self.uri_base and u'.'.join([self.uri_base,uri]) or uri,
+                        *a,
+                        **kw
+                    )
 
-    def call(self,uri,*args,**kwargs):
-        if self.uri_base:
-            uri = u'.'.join([self.uri_base,uri])
-        return self.wamp.session.call(uri,*args,**kwargs)
 
 wamp = WAMP()
 

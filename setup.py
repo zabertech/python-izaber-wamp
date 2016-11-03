@@ -16,5 +16,8 @@ setup(name='izaber_wamp',
       install_requires=[
           'izaber'
       ],
+      dependency_links=[
+          'git+https://gitlab.izaber.com/systems/izaber.git#egg=izaber-1.0.0'
+      ],
       zip_safe=False)
 
