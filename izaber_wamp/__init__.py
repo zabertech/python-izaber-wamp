@@ -7,7 +7,7 @@ from controller import WAMP
 
 autoloader.add_prefix('izaber.wamp')
 
-__version__ = '1.10'
+__version__ = '1.11'
 
 CONFIG_BASE = """
 default:
