@@ -3,7 +3,7 @@ from izaber import config, app_config, autoloader
 from izaber.startup import request_initialize, initializer
 from izaber.log import log
 
-from controller import WAMP
+from izaber.wamp.controller import WAMP
 
 autoloader.add_prefix('izaber.wamp')
 

@@ -2,6 +2,8 @@ from autobahn_sync import AutobahnSync
 import os
 import certifi
 
+from izaber.compat import *
+
 os.environ["SSL_CERT_FILE"] = certifi.where()
 
 class WAMP(object):
