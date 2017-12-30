@@ -3,7 +3,7 @@
 from setuptools import setup
 
 setup(name='izaber_wamp',
-      version='1.12',
+      version='2.00',
       description='Base load point for iZaber WAMP code',
       url='',
       author='Aki Mimoto',
@@ -13,12 +13,8 @@ setup(name='izaber_wamp',
       scripts=[],
       install_requires=[
           'izaber',
-          'autobahn_sync',
-          'certifi',
-          'service_identity',
-          'pyOpenSSL',
-          'ndg-httpsclient',
-          'pyasn1',
+          'websocket-client',
+          'six',
       ],
       dependency_links=[
           'git+https://gitlab.izaber.com/systems/izaber.git#egg=izaber-1.05'

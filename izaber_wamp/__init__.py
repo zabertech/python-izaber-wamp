@@ -3,7 +3,7 @@ from izaber import config, app_config, autoloader
 from izaber.startup import request_initialize, initializer
 from izaber.log import log
 
-from izaber.wamp.controller import WAMP
+from .controller import WAMP
 
 autoloader.add_prefix('izaber.wamp')
 
@@ -36,7 +36,7 @@ def load_config(**kwargs):
         url=client_options.get('url',u'wss://nexus.izaber.com/ws'),
         uri_base=client_options.get('uri_base',u'com.izaber.wamp'),
         realm=client_options.get('realm',u'izaber'),
-        authmethod=client_options.get('authmethod',[u'ticket']),
+        authmethods=client_options.get('authmethods',[u'ticket']),
     )
 
     if AUTORUN and config.wamp.get('run',True):
