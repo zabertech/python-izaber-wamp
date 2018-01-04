@@ -1,4 +1,3 @@
-from autobahn_sync import AutobahnSync
 import os
 import certifi
 

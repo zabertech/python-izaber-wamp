@@ -54,7 +54,7 @@ class WAMPClient(threading.Thread):
                 authmethods=[u'ticket'],
                 username=None,
                 password=None,
-                timeout=None,
+                timeout=10,
                 ):
 
         super(WAMPClient,self).__init__()
@@ -146,6 +146,7 @@ class WAMPClient(threading.Thread):
         """ Send awamp message to the server. We don't wait
             for a response here. Just fire out a message
         """
+        print message.dump()
         message = message.as_str()
         self.ws.send(message)
 
@@ -196,18 +197,22 @@ class WAMPClient(threading.Thread):
         """
         self.dispatch_to_awaiting(error)
 
+    def handle_abort(self, abort):
+        """ We're done!
+        """
+        self.stop()
+
     def handle_invocation(self, message):
         req_id = message.request_id
         reg_id = message.registration_id
         if reg_id in self._registered_calls:
             result = self._registered_calls[reg_id](
                 message,
-                *(message.args)
+                *(message.args),
                 **(message.kwargs)
             )
             self.send_message(YIELD(
                 request_id = req_id,
-                registration_id = reg_id,
                 options={},
                 args=[result]
             ))
@@ -232,7 +237,7 @@ class WAMPClient(threading.Thread):
             into the queue just in case someone wants to do something
             with it but we'll just blackhole it.
         """
-        self.dispatch_to_awaiting(result)
+        self.dispatch_to_awaiting(message)
 
     def subscribe(self,topic,callback=None,options=None):
         """ Subscribe to a uri for events from a publisher
@@ -278,7 +283,7 @@ class WAMPClient(threading.Thread):
         for i in range(100):
             if not self._running:
                 break
-            sleep(0.1)
+            time.sleep(0.1)
 
     def start(self):
         """ Initialize websockets, login and start listening for events
@@ -307,6 +312,8 @@ class WAMPClient(threading.Thread):
                 data = self.ws.recv()
             except websocket.WebSocketTimeoutException:
                 continue
+            except websocket.WebSocketConnectionClosedException:
+                break
             if not data: continue
 
             try:

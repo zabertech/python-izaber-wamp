@@ -10,7 +10,7 @@ OPT = {'required': False}
 MESSAGE_TYPES = dict(
     HELLO        = [ CODE('code',1), URI('realm'), DICT('details') ],
     WELCOME      = [ CODE('code',2), ID('session_id'), DICT('details') ],
-    ABORT        = [ CODE('code',3), URI('session'), DICT('details') ],
+    ABORT        = [ CODE('code',3), DICT('details'), URI('reason') ],
     CHALLENGE    = [ CODE('code',4), STRING('auth_method'), DICT('extra') ],
     AUTHENTICATE = [ CODE('code',5), STRING('signature'), DICT('extra') ],
     GOODBYE      = [ CODE('code',6), DICT('details'), URI('reason') ],
@@ -35,7 +35,7 @@ MESSAGE_TYPES = dict(
     RESULT       = [ CODE('code',50), ID('request_id'), DICT('details'),
                       LIST('args',**OPT), DICT('kwargs',**OPT) ],
 
-    REGISTER     = [ CODE('code',64), ID('request_id'), URI('procedure') ],
+    REGISTER     = [ CODE('code',64), ID('request_id'), DICT('details'), URI('procedure') ],
     REGISTERED   = [ CODE('code',65), ID('request_id'), ID('registration_id') ],
     UNREGISTER   = [ CODE('code',66), ID('request_id'), ID('registration_id') ],
     UNREGISTERED = [ CODE('code',67), ID('request_id') ],
@@ -43,7 +43,7 @@ MESSAGE_TYPES = dict(
     INVOCATION   = [ CODE('code',68), ID('request_id'), ID('registration_id'), DICT('details'),
                       LIST('args',**OPT), DICT('kwargs',**OPT) ],
 
-    YIELD        = [ CODE('code',68), ID('request_id'), DICT('options'),
+    YIELD        = [ CODE('code',70), ID('request_id'), DICT('options'),
                       LIST('args',**OPT), DICT('kwargs',**OPT) ],
 )
 MESSAGE_CLASS_LOOKUP = {}
@@ -97,6 +97,16 @@ class WampMessage(object):
         for field in self._fields:
             record.append(self[field.name])
         return record
+
+    def dump(self):
+        s = u"JSON({})={}".format(self.code_name,self.as_str())
+        s += u"\n------------------------------\n"
+        for field in self._fields:
+            s += u'{}: {}\n'.format(
+                          field.name,
+                          self[field.name]
+                      )
+        return s
 
     def as_str(self):
         return json.dumps(self.package())
