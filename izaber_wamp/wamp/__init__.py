@@ -146,7 +146,6 @@ class WAMPClient(threading.Thread):
         """ Send awamp message to the server. We don't wait
             for a response here. Just fire out a message
         """
-        print message.dump()
         message = message.as_str()
         self.ws.send(message)
 
