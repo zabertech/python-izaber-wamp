@@ -1,9 +1,13 @@
+import os
+import certifi
 
 from izaber import config, app_config, autoloader
 from izaber.startup import request_initialize, initializer
 from izaber.log import log
 
-from .controller import WAMP
+from swampyer import WAMPClientTicket
+
+os.environ["SSL_CERT_FILE"] = certifi.where()
 
 autoloader.add_prefix('izaber.wamp')
 
@@ -18,6 +22,39 @@ default:
             password: 'changeme'
             url: 'wss://nexus.izaber.com/wss'
 """
+
+class WAMP(object):
+
+    def __init__(self,*args,**kwargs):
+        self.wamp = WAMPClientTicket()
+        self.configure(**kwargs)
+
+    def configure(self,**kwargs):
+        self.wamp.configure(**kwargs)
+
+    def run(self):
+        self.wamp.start()
+        return self
+
+    def disconnect(self):
+        self.wamp.stop()
+
+    def __getattr__(self,k):
+        if not k in (
+                        'call',
+                        'leave',
+                        'publish',
+                        'register',
+                        'subscribe'
+                    ):
+            raise AttributeError("'WAMP' object has no attribute '{}'".format(k))
+        fn = getattr(self.wamp,k)
+        return lambda uri, *a, **kw: fn(
+                        uri,
+                        *a,
+                        **kw
+                    )
+
 
 AUTORUN = True
 wamp = WAMP()

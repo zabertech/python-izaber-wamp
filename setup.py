@@ -9,16 +9,12 @@ setup(name='izaber_wamp',
       author='Aki Mimoto',
       author_email='aki+izaber@zaber.com',
       license='MIT',
-      packages=['izaber_wamp','izaber_wamp/wamp'],
+      packages=['izaber_wamp'],
       scripts=[],
       install_requires=[
           'izaber',
-          'certifi',
-          'websocket-client',
-          'six',
+          'swampyer',
       ],
-      dependency_links=[
-          'git+https://gitlab.izaber.com/systems/izaber.git#egg=izaber-1.05'
-      ],
+      dependency_links=[],
       zip_safe=False)
 
