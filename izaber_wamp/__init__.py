@@ -1,13 +1,10 @@
 import os
-import certifi
 
 from izaber import config, app_config, autoloader
 from izaber.startup import request_initialize, initializer
 from izaber.log import log
 
 from swampyer import WAMPClientTicket
-
-os.environ["SSL_CERT_FILE"] = certifi.where()
 
 autoloader.add_prefix('izaber.wamp')
 
