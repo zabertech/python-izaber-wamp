@@ -34,7 +34,7 @@ class WAMP(object):
         return self
 
     def disconnect(self):
-        self.wamp.stop()
+        self.wamp.disconnect()
 
     def __getattr__(self,k):
         if not k in (
