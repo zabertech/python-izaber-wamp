@@ -71,6 +71,7 @@ def load_config(**kwargs):
         uri_base=client_options.get('uri_base',u'com.izaber.wamp'),
         realm=client_options.get('realm',u'izaber'),
         authmethods=client_options.get('authmethods',[u'ticket']),
+        timeout=client_options.get('timeout', 10)
     )
 
     if AUTORUN and config.wamp.get('run',True):
