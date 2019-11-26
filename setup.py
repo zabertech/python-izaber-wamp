@@ -3,7 +3,7 @@
 from setuptools import setup
 
 setup(name='izaber_wamp',
-      version='2.20161126',
+      version='2.20191126',
       description='Base load point for iZaber WAMP code',
       url = 'https://github.com/zabertech/python-izaber-wamp',
       download_url = 'https://github.com/zabertech/python-izaber-wamp/archive/2.20191126.tar.gz',
