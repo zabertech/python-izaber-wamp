@@ -8,7 +8,7 @@ from swampyer import WAMPClientTicket
 
 autoloader.add_prefix('izaber.wamp')
 
-__version__ = '1.12'
+__version__ = '2.20210228'
 
 CONFIG_BASE = """
 default:
@@ -18,6 +18,7 @@ default:
             username: 'anonymous'
             password: 'changeme'
             url: 'wss://nexus.izaber.com/wss'
+            serializer: 'cbor'
 """
 
 class WAMP(object):
@@ -64,6 +65,14 @@ def load_config(**kwargs):
 
     client_options = config.wamp.connection.dict()
 
+    # Going to default to cbor if possible due to the richness of the
+    # data types
+    try:
+        import cbor
+        serializers = client_options.get('serializers',['cbor'])
+    except:
+        serializers = client_options.get('serializers',['json'])
+
     wamp.configure(
         username=client_options.get('username',u''),
         password=client_options.get('password',u''),
@@ -71,7 +80,8 @@ def load_config(**kwargs):
         uri_base=client_options.get('uri_base',u'com.izaber.wamp'),
         realm=client_options.get('realm',u'izaber'),
         authmethods=client_options.get('authmethods',[u'ticket']),
-        timeout=client_options.get('timeout', 10)
+        timeout=client_options.get('timeout', 10),
+        serializers=serializers,
     )
 
     if AUTORUN and config.wamp.get('run',True):
