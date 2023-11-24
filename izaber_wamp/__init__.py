@@ -10,7 +10,7 @@ import swampyer
 
 autoloader.add_prefix('izaber.wamp')
 
-__version__ = '3.0.20231030'
+__version__ = '2.20231030'
 
 CONFIG_BASE = """
 default:
@@ -20,6 +20,7 @@ default:
             username: 'anonymous'
             password: 'changeme'
             url: 'wss://nexus.izaber.com/wss'
+            serializer: 'cbor'
 """
 class WAMPClientTicket(swampyer.WAMPClientTicket):
 
