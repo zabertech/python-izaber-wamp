@@ -14,7 +14,7 @@ This library expects the `izaber.yaml` to be setup with something like the follo
 default:
   wamp:
     connection:
-      url: 'wss://nexus.izaber.conexus.izaber.comm/ws'
+      url: 'wss://nexus.izaber.com/ws'
       username: 'USERNAME'
       password: 'PASSWORD'
 ```
@@ -35,7 +35,7 @@ Since the `izaber_wamp` library is designed with Zaber mind, the `com.iaber.wamp
 from izaber import initialize
 from izaber_wamp import wamp
 
-initialize('')
+initialize()
 
 me = wamp.call('auth.whoami')
 print(me)
@@ -49,7 +49,7 @@ In the following example, 2 position parameters are provided as well as two keyw
 from izaber import initialize
 from izaber_wamp import wamp
 
-initialize('')
+initialize()
 
 # Prefix is added to become: com.izaber.wamp.example.call
 results = wamp.call('example.call', 'pos1', 'pos2', keyword1='value1', keyword2='value2')
@@ -72,7 +72,7 @@ import time
 from izaber import initialize
 from izaber_wamp import wamp
 
-initialize('')
+initialize()
 
 def example_hello_fn(event):
     """ Demonstrates creating a registered callable that does not require
@@ -114,7 +114,7 @@ import time
 from izaber import initialize
 from izaber_wamp import wamp
 
-initialize('')
+initialize()
 
 def example_hello_fn(event):
     """ Demonstrates creating a registered callable that does not require
@@ -167,7 +167,7 @@ In this example, this creates a simple subscription to receive push notification
 from izaber import initialize
 from izaber_wamp import wamp
 
-initialize('')
+initialize()
 
 def subscribe_event(event, *args, **kwargs):
     print("subscription event:", event)
@@ -210,7 +210,7 @@ def join_hook(details):
 # Must be called before the initialize!
 wamp.hook('join', join_hook)
 
-initialize('')
+initialize()
 
 input("Hit enter to stop service\n")
 ```
@@ -301,4 +301,5 @@ docker exec -ti izaber-wamp bash
     poetry build
     poetry publish
     ```
+
 
