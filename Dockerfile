@@ -1,4 +1,4 @@
-FROM zaberit/nexus:3.0.20230620
+FROM zaberit/nexus:latest
 
 # Make the src directory
 USER root

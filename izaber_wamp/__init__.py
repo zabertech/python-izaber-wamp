@@ -1,11 +1,12 @@
 import os
+import copy
 import inspect
 
 from izaber import config, app_config, autoloader
 from izaber.startup import request_initialize, initializer
 from izaber.log import log
 
-from swampyer import WAMPClientTicket
+import swampyer
 
 autoloader.add_prefix('izaber.wamp')
 
@@ -19,111 +20,184 @@ default:
             username: 'anonymous'
             password: 'changeme'
             url: 'wss://nexus.izaber.com/wss'
-            serializer: 'cbor'
 """
+class WAMPClientTicket(swampyer.WAMPClientTicket):
 
-HOOKS = [
-    'connect',
-    'join',
-    'leave',
-    'disconnect',
-    'error',
-    'unknown',
-]
+    ################################################################
+    # Misc
+    ################################################################
 
-def hook_wrapper(self, hook_name, hook_func):
-    def wrapped( *args, **kwargs ):
-        if self.hooks and self.hooks.get(hook_name):
-            run_parent_hook = False
-
-            # Iterate through all the associated hooks. If one of the hooks
-            # returns a Truthy value, we'll invoke the parent function. Normally
-            # we're probably trying to run our own handle rather than the parent
-            # function (which is why you'd want to hook a handler anyways!)
-            for hook_id, hook_fn in self.hooks[hook_name].items():
-                if hook_fn(*args, **kwargs):
-                    run_parent_hook = True
-
-            # If requested to run the original hook, we do so at the
-            # end
-            if not run_parent_hook:
-                return
-
-        hook_func(*args, **kwargs)
-    return wrapped
-
-class IZaberWAMPClientTicket(WAMPClientTicket):
-
-    hooks = None
-
-    def __init__(self):
-        self.hooks = {}
-
-        # Wrap the hooks
-        for hook_name in HOOKS:
-            self.hooks[hook_name] = {}
-            fn_name = f"handle_{hook_name}"
-            fn = getattr(self, fn_name)
-            hooked_fn = hook_wrapper(self, hook_name, fn)
-            setattr(self, fn_name, hooked_fn)
-
-        super().__init__()
-
-    def hook(self, handle_name, handle_function):
-        """ Adds a function hook to a particular scheme.
+    def whoami(self):
+        """ Returns list of active directory users
         """
-        hooks = self.hooks[handle_name]
-        hook_id = id(handle_function)
-        hooks[hook_id] = handle_function
-        return f"{handle_name}:{hook_id}"
+        return self.call('auth.whoami')
 
-    def unhook(self, handle_id):
-        """ Removes a hook if setup. The return code is whether
-            or not any hook was actually removed. Ignoring the
-            error code has no bad impact, the hook will not called
-            either way
+    def ad_users(self):
+        """ Returns list of active directory users
         """
-        (handle_name, hook_id) = handle_id.split(':')
-        if handle_name not in self._hook:
-            return False
-        if handle_id not in self._hook[handle_name]:
-            return False
-        del self._hook[handle_name][hook_id]
-        return True
+        return self.call('ad.users')
+
+    def ad_groups(self):
+        """ Returns list of active directory users
+        """
+        return self.call('ad.groups')
+
+    ################################################################
+    # Roster
+    ################################################################
+
+    def roster_register(self, roster_key, data, visibility=None):
+        return self.call('system.roster.register', roster_key, data, visibility)
+
+    def roster_query(self, roster_key):
+        return self.call('system.roster.query', roster_key)
+
+    def roster_unregister(self, roster_key):
+        return self.call('system.roster.unregister', roster_key)
+
+    ################################################################
+    # Metadata
+    ################################################################
+
+    def metadata_set(self, meta_key, value, yaml=False):
+        return self.call('my.metadata.set', meta_key, value, yaml)
+
+    def metadata_get(self, meta_key):
+        return self.call('my.metadata.get', meta_key)
+
+    def metadata_list(self):
+        return self.call('my.metadata.list')
+
+    def metadata_delete(self, uuid_64):
+        return self.call('my.metadata.delete', uuid_64)
+
+    ################################################################
+    # API KEYS
+    ################################################################
+
+    def apikeys_create(self, data_rec=None):
+        return self.call('my.apikeys.create', data_rec)
+
+    def apikeys_list(self):
+        return self.call('my.apikeys.list')
+
+    def apikeys_delete(self, meta_key):
+        return self.call('my.apikeys.delete', meta_key)
+
+    ################################################################
+    # OTP
+    ################################################################
+
+    def otp_create(self):
+        return self.call('my.otps.create')
+
+    def otp_list(self):
+        return self.call('my.otps.list')
+
+    def otp_delete(self, uuid_b64):
+        return self.call('my.otps.delete', uuid_b64)
+
+# This can be set outside of the library to whatever class is desired
+WAMP_CLASS = WAMPClientTicket
+
+# This is a decorator to make the job easier
+def wamp_client_subclass(klass):
+    global WAMP_CLASS 
+    WAMP_CLASS = klass
+    return klass
 
 class WAMP(object):
+    wamp = None
 
-    def __init__(self,*args,**kwargs):
-        self.wamp = IZaberWAMPClientTicket()
+    def __init__(self, *args, **kwargs):
+        self.wamp = None
         self._original_options = kwargs
-        self.configure(**kwargs)
-
-    def configure(self,**kwargs):
-        self.wamp.configure(**kwargs)
 
     def run(self):
         self.wamp.start()
         return self
 
-    def disconnect(self):
-        self.wamp.disconnect()
+    def configure(self, **client_options):
+
+        # Going to default to cbor if possible due to the richness of the
+        # data types
+        try:
+            import cbor
+            serializers = client_options.get('serializers',['cbor'])
+        except:
+            serializers = client_options.get('serializers',['json'])
+
+        client_options.setdefault('serializers', serializers)
+        client_options.setdefault('username','')
+        client_options.setdefault('password','')
+        client_options.setdefault('url','wss://nexus.izaber.com')
+        client_options.setdefault('uri_base','com.izaber.wamp')
+        client_options.setdefault('realm','izaber')
+        client_options.setdefault('authmethods',['ticket'])
+
+        # 5 minute default timeout since we've started to see some longer
+        # running functions get hit.
+        client_options.setdefault('timeout', 60*5)
+
+        # Save the connection information
+        self._original_options = client_options
+        self.wamp.configure(**client_options)
 
     def reset(self):
         """ Used to reset this particular instance into a state equvalent
             to if this module was just loaded. Useful mostly for testing
         """
-        self.wamp = IZaberWAMPClientTicket()
-        self.configure(**self._original_options)
+        self.wamp = None
+
+    def change_user(self, username, password):
+        """ This will dispose and reconnect the local wamp session under
+            a different credential
+        """
+        self.wamp = None
+        self._original_options.update({
+            'username': username,
+            'password': password,
+        })
+        wamp.reset()
+        self.run()
+        return self
+
+    def spawn_connection(self, username, password, wamp_class=WAMPClientTicket, **kwargs):
+        """ This will spawn a new connection to using the wamp_class provided.
+            Note that by default it will be WAMPClientTicket as we do not want
+            the join handler to be called
+        """
+        options = copy.deepcopy(self._original_options)
+        options.update({
+            'username': username,
+            'password': password,
+        })
+        options.update(kwargs)
+        wamp = wamp_class(**options)
+        wamp.start()
+        return wamp
+
+    def __getattribute__(self,k):
+        global WAMP_CLASS 
+        # This lets us lazy load the wamp class. We'll try and hold off
+        # on instantiating the wamp connection until we really need it
+        if k == 'wamp':
+            wamp = object.__getattribute__(self, k)
+            if not wamp:
+                wamp = WAMP_CLASS()
+                object.__setattr__(self, 'wamp', wamp)
+                self.configure(**self._original_options)
+            return wamp
+        return object.__getattribute__(self, k)
 
     def __getattr__(self,k):
         """ For the most part we just proxy the requests through to the
             underlying swampyer object.
         """
+        # Then, if we are getting an argument that is not associated with
+        # this class directly, we'll just proxy it over to self.wamp
         fn = getattr(self.wamp,k)
-        return lambda *a, **kw: fn(
-                        *a,
-                        **kw
-                    )
+        return fn
 
 AUTORUN = True
 wamp = WAMP()
@@ -134,31 +208,10 @@ def load_config(**kwargs):
     request_initialize('logging',**kwargs)
     config.config_amend_(CONFIG_BASE)
 
+    wamp.reset()
+
     client_options = config.wamp.connection.dict()
-
-    # Going to default to cbor if possible due to the richness of the
-    # data types
-    try:
-        import cbor
-        serializers = client_options.get('serializers',['cbor'])
-    except:
-        serializers = client_options.get('serializers',['json'])
-
-    client_options.setdefault('username','')
-    client_options.setdefault('password','')
-    client_options.setdefault('url','wss://nexus.izaber.com')
-    client_options.setdefault('uri_base','com.izaber.wamp')
-    client_options.setdefault('realm','izaber')
-    client_options.setdefault('authmethods',['ticket'])
-
-    # 5 minute default timeout since we've started to see some longer
-    # running functions get hit.
-    client_options.setdefault('timeout',60*5)
-
-    wamp.configure(
-        **client_options,
-        serializers=serializers,
-    )
+    wamp.configure(**client_options)
 
     if AUTORUN and config.wamp.get('run',True):
         wamp.run()

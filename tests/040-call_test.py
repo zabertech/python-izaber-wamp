@@ -72,7 +72,7 @@ def test_connect():
     # via izaber.wamp
     initialize('', config={
         'config_filename': str(izaber_fpath)
-    })
+    }, force=True)
 
     # There should now be a wamp connection
     time.sleep(0.3)
@@ -80,6 +80,7 @@ def test_connect():
 
     # Call our function
     hello = wamp.call('hello', 'arg1', keyword1='value1')
+    assert hello
     print("????", hello)
 
 if __name__ == "__main__":

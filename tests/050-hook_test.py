@@ -3,9 +3,7 @@
 from lib import *
 
 from izaber import initialize
-from izaber.wamp import wamp
-from izaber.startup import initialization_rack
-import swampyer
+from izaber_wamp import wamp, wamp_client_subclass, WAMPClientTicket
 
 IZABER_TEMPLATE = """
 default:
@@ -16,6 +14,15 @@ default:
       password: '{password}'
 
 """
+
+@wamp_client_subclass
+class HandleJoins(WAMPClientTicket):
+    def __init__(self, *args, **kwargs):
+        self._join_count = 0
+        super().__init__(*args, **kwargs)
+
+    def handle_join(self, *a, **kw):
+        self._join_count += 1
 
 def hello_example(event, *args, **kwargs):
     print(f"TYPE: {type(event)} event")
@@ -42,39 +49,16 @@ def test_hook():
     )
     izaber_fh.close()
 
-    # Attach our join hook
-    JOIN_CALLS = []
-    def join_hook(details):
-        JOIN_CALLS.append(details)
-
-    assert not JOIN_CALLS
-    wamp.hook('join', join_hook)
-
-    # Attach our disconnect hook
-    DISCONNECTS = []
-    def disconnect_hook(details):
-        DISCONNECTS.append(details)
-    wamp.hook('disconnect', disconnect_hook)
-    assert not DISCONNECTS
-
     # If that worked, let's try logging in
     # via izaber.wamp
     initialize(config={
         'config_filename': str(izaber_fpath)
     }, force=True)
 
-    # There should now be a wamp connection
-    time.sleep(0.3)
-    assert wamp.is_connected()
+    whoami = wamp.call('auth.whoami')
+    assert whoami
 
-    time.sleep(2)
-
-    # Verify that the `join_hook` has been called
-    assert JOIN_CALLS
-
-    # Disconnect our client
-    assert not DISCONNECTS
-    wamp.
+    assert wamp._join_count == 1
 
 if __name__ == "__main__":
     test_hook()
