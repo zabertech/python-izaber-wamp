@@ -122,11 +122,15 @@ class WAMP(object):
 
         # Going to default to cbor if possible due to the richness of the
         # data types
-        try:
-            import cbor
-            serializers = client_options.get('serializers',['cbor'])
-        except:
-            serializers = client_options.get('serializers',['json'])
+        serializer = client_options.pop('serializer', None)
+        if serializer:
+            serializers = [serializer]
+        else:
+            try:
+                import cbor
+                serializers = client_options.get('serializers',['cbor'])
+            except:
+                serializers = client_options.get('serializers',['json'])
 
         client_options.setdefault('serializers', serializers)
         client_options.setdefault('username','')

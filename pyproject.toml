@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "izaber-wamp"
-version = "3.0.20231030"
+version = "3.0.20231125a2"
 description = "Base load point for iZaber WAMP code"
 authors = ["Aki Mimoto <aki@zaber.com>"]
 packages = [
@@ -10,12 +10,13 @@ packages = [
 [tool.poetry.dependencies]
 python = ">=3.7.0,<4.0"
 izaber = ">=3.1.20231029"
-swampyer = "^3.0.20231027"
+swampyer = ">=3.0.20231027"
+cbor2 = ">=4.1.2"
 
 [tool.poetry.dev-dependencies]
 pytest = ">=4.6.11"
-nox = "^2022.1.7"
-Faker = "^13.3.4"
+nox = "^2023.4.22"
+Faker = "^18.13.0"
 passlib = "^1.7.4"
 
 [build-system]
