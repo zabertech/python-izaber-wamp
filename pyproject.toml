@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "izaber-wamp"
-version = "3.0.20231125a2"
+version = "3.0.20231125"
 description = "Base load point for iZaber WAMP code"
 authors = ["Aki Mimoto <aki@zaber.com>"]
 packages = [
