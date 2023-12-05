@@ -1,6 +1,9 @@
 import os
 import copy
 import inspect
+from pathlib import Path
+from typing import Union, Optional, List, Dict
+from typing_extensions import TypedDict
 
 from izaber import config, app_config, autoloader
 from izaber.startup import request_initialize, initializer
@@ -22,6 +25,11 @@ default:
             url: 'wss://nexus.izaber.com/wss'
             serializer: 'cbor'
 """
+
+class Attachment(TypedDict):
+    name: str
+    data: bytearray
+
 class WAMPClientTicket(swampyer.WAMPClientTicket):
 
     ################################################################
@@ -98,12 +106,57 @@ class WAMPClientTicket(swampyer.WAMPClientTicket):
     def otp_delete(self, uuid_b64):
         return self.call('my.otps.delete', uuid_b64)
 
+    ################################################################
+    # Email
+    ################################################################
+
+    def email_send(self,
+                   recipient: Union[str, List[str]],
+                   subject: str,
+                   message: str,
+                   sender: Optional[str] = None) -> None:
+        """ Sends a plaintext message to the recipients. If the sender is left empty, the system
+            will opt to use the sender address <authid>@zaber.com
+        """
+        self.call('email.send',
+                    recipient=recipient,
+                    sender=sender,
+                    subject=subject,
+                    message=message,
+                )
+
+    def email_send_templated(self,
+                   recipient: Union[str, List[str]],
+                   subject: str,
+                   message: dict,
+                   sender: Optional[str] = None,
+                   attachments: Optional[
+                                          List[
+                                              Union[
+                                                      str,
+                                                      Path,
+                                                      Attachment,
+                                                  ]
+                                              ]
+                                        ] = None,
+                   template: str ='default'
+                  ) -> None:
+        """ Provides markdown, inline image and attachment support
+        """
+        wamp.call('email.send.templated',
+                    recipient=recipient,
+                    sender=sender,
+                    subject=subject,
+                    message=message,
+                    attachments=attachments,
+                )
+
 # This can be set outside of the library to whatever class is desired
 WAMP_CLASS = WAMPClientTicket
 
 # This is a decorator to make the job easier
 def wamp_client_subclass(klass):
-    global WAMP_CLASS 
+    global WAMP_CLASS
     WAMP_CLASS = klass
     return klass
 
@@ -183,7 +236,7 @@ class WAMP(object):
         return wamp
 
     def __getattribute__(self,k):
-        global WAMP_CLASS 
+        global WAMP_CLASS
         # This lets us lazy load the wamp class. We'll try and hold off
         # on instantiating the wamp connection until we really need it
         if k == 'wamp':
