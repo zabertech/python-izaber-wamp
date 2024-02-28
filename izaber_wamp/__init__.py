@@ -19,7 +19,7 @@ default:
         connection:
             username: 'anonymous'
             password: 'changeme'
-            url: 'wss://nexus.izaber.com/wss'
+            url: 'wss://nexus.izaber.com/ws'
             serializer: 'cbor'
 """
 class WAMPClientTicket(swampyer.WAMPClientTicket):
