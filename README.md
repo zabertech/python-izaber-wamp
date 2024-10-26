@@ -232,74 +232,37 @@ This library is uploaded to PyPi. Installation for usage can be done with:
 For hacking on the code, this requires the following:
 
 - `git`
-- `python3`
-- [poetry](https://python-poetry.org/)
+- `>=python3.8`
+- [pdm](https://pdm-project.org/en/latest/)
 
 ### Setup
 
 ```bash
 git clone git@github.com:zabertech/python-izaber-wamp.git
 cd python-izaber-wamp
-poetry install
-poetry shell
+pdm install
 ```
 
 And now it's possible to make changes to the code
 
-### Tests via CLI
-
-As we test on multiple versions of python, getting setup for tests is a bit annoying.
-
-Running on Ubuntu, the setup process is to install the appropriate python versions as well as required support binaries and libraries.
-
-```bash
-sudo add-apt-repository ppa:deadsnakes/ppa
-sudo apt install python3.6 python3.7 python3.8 python3.9 python3.10 libxml2-dev libxslt1-dev build-essential pypy3-dev python3.6-dev python3.7-dev python3.8-dev python3.9-dev python3.10-dev libssl-dev
-```
-
-Then running the tests becomes:
-
-```bash
-poetry run nox
-```
-
 ### Tests via Docker
 
-It's not always desireable to pollute the environment with multiple versions of python so a Dockerfile is provided for testing.
+It's not always desireable to pollute the environment with multiple versions of python so using docker compose is the recommend method for testing.
 
 ```bash
-docker build -t tests-izaber-wamp .
-docker run tests-izaber-wamp
+docker compose up
 ```
 
-To use the local copy of the library files, can do the following instead:
-
-```bash
-docker run --rm -v `pwd`:/python-izaber-wamp tests-izaber-wamp
-```
-
-To work in the enviroment try this:
-
-First, run:
-
-```bash
-docker run --rm -v `pwd`:/python-izaber-wamp --name 'izaber-wamp' tests-izaber-wamp sleep infinity
-```
-
-Then to access:
-
-```bash
-docker exec -ti izaber-wamp bash
-```
+If you would like to work within the container, have a look at the `docker-compose.yml` and update the `CMD` to `sleep infinity` and it will provide a shell environment (via something like `docker compose exec src bash`) for testing the code within a container.
 
 ### Packaging
 
 - Ensure that the `pyproject.toml` has the newest version.
 - Update the `VERSIONS.md` with the changes made into the library
-- Then, assuming access to the pypi account. [Poetry can publish to PyPI](https://python-poetry.org/docs/libraries/#publishing-to-pypi)
+- Then, assuming access to the pypi account.
     ```bash
-    poetry build
-    poetry publish
+    pdm build
+    pdm publish
     ```
 
 

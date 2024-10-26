@@ -1,24 +1,30 @@
-[tool.poetry]
+[project]
 name = "izaber-wamp"
 version = "3.0.20231125"
 description = "Base load point for iZaber WAMP code"
-authors = ["Aki Mimoto <aki@zaber.com>"]
-packages = [
-  { include = "izaber_wamp" }
+authors = [
+  { name="Aki Mimoto", email= "aki@zaber.com>" },
+]
+requires-python = ">=3.8.0,<4.0"
+dependencies = [
+    "izaber >=3.1.20231029",
+    "swampyer >=3.0.20231027",
+    "cbor2 >=4.1.2",
+    "typing-extensions >=4.7.1",
 ]
 
-[tool.poetry.dependencies]
-python = ">=3.7.0,<4.0"
-izaber = ">=3.1.20231029"
-swampyer = ">=3.0.20231027"
-cbor2 = ">=4.1.2"
-
-[tool.poetry.dev-dependencies]
-pytest = ">=4.6.11"
-nox = "^2023.4.22"
-Faker = "^18.13.0"
-passlib = "^1.7.4"
-
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+[tool.pdm]
+package-dir = {"" = "src"}
+
+[tool.pdm.dev-dependencies]
+dev = [
+    "pytest >=4.6.11",
+    "nox >=2023.4.22",
+    "Faker >=18.13.0",
+    "passlib >=1.7.4",
+]
+

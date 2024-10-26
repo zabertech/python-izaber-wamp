@@ -6,17 +6,6 @@ from izaber import initialize
 from izaber.wamp import wamp
 import swampyer
 
-
-IZABER_TEMPLATE = """
-default:
-  wamp:
-    connection:
-      url: 'ws://localhost:8282/ws'
-      username: '{username}'
-      password: '{password}'
-
-"""
-
 def hello_example(event, *args, **kwargs):
 
     print(f"TYPE: {type(event)} event")
@@ -41,8 +30,8 @@ def test_connect():
 
     # Do a valid connection
     swampyer_client = swampyer.WAMPClientTicket(
-                url="ws://localhost:8282/ws",
-                realm="izaber",
+                url=NEXUS_URL,
+                realm=NEXUS_REALM,
                 username=username,
                 password=password,
                 uri_base='com.izaber.wamp',

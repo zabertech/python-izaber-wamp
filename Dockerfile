@@ -1,16 +1,5 @@
 FROM zaberit/nexus:latest
 
-# Make the src directory
-USER root
-RUN mkdir /src && chown -R zaber: /src
-USER zaber
-
-# Copy over the data files
-COPY . /src
-
-# Let's sit in the src directory by default
-WORKDIR /src
-
 USER root
 
 RUN apt update ; apt install -y software-properties-common ; add-apt-repository ppa:deadsnakes/ppa \
@@ -40,6 +29,10 @@ RUN apt update ; apt install -y software-properties-common ; add-apt-repository 
             python3.12 \
             python3.12-dev \
             python3.12-distutils \
+            python3.13 \
+            python3.13-dev \
+            # Doesn't exist?
+            #python3.13-distutils \
             telnet \
             vim-nox \
     # Pip is handy to have around
@@ -55,17 +48,19 @@ RUN apt update ; apt install -y software-properties-common ; add-apt-repository 
 
 USER zaber
 
-ENV PATH /home/zaber/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+# Copy over the data files
+COPY --chown=zaber:zaber . /src
 
-RUN echo "Installing Poetry" \
-    # Poetry is used managing deps and such
-    && curl -sSL https://install.python-poetry.org -o /tmp/install-poetry.py \
-    && python3 /tmp/install-poetry.py \
+# Let's sit in the src directory by default
+WORKDIR /src
+
+ENV PATH=/home/zaber/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+RUN echo "Pre-installing required development libraries" \
     # SETUP Environment
     && /src/docker/setup-env.sh \
     ;
 
-
-CMD /src/docker/run-test.sh
+CMD [ "/src/docker/run-test.sh" ]
 
 

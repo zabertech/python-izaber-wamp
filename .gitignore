@@ -258,3 +258,10 @@ tests/data/snapshot.json
 
 izaber.yaml
 
+volumes
+
+
+__pypackages__
+.pdm.toml
+.pdm-python
+

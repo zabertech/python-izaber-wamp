@@ -12,16 +12,6 @@ from izaber import initialize
 from izaber_wamp import wamp, wamp_client_subclass
 import swampyer
 
-IZABER_TEMPLATE = """
-default:
-  wamp:
-    connection:
-      url: 'ws://localhost:8282/ws'
-      username: '{username}'
-      password: '{password}'
-
-"""
-
 from swampyer import WAMPClientTicket
 
 
