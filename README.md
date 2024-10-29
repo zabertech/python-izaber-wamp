@@ -253,6 +253,10 @@ It's not always desireable to pollute the environment with multiple versions of 
 docker compose up
 ```
 
+```bash
+docker compose logs -f src
+```
+
 If you would like to work within the container, have a look at the `docker-compose.yml` and update the `CMD` to `sleep infinity` and it will provide a shell environment (via something like `docker compose exec src bash`) for testing the code within a container.
 
 ### Packaging
