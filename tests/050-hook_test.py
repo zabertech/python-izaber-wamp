@@ -5,16 +5,6 @@ from lib import *
 from izaber import initialize
 from izaber_wamp import wamp, wamp_client_subclass, WAMPClientTicket
 
-IZABER_TEMPLATE = """
-default:
-  wamp:
-    connection:
-      url: 'ws://localhost:8282/ws'
-      username: '{username}'
-      password: '{password}'
-
-"""
-
 @wamp_client_subclass
 class HandleJoins(WAMPClientTicket):
     def __init__(self, *args, **kwargs):

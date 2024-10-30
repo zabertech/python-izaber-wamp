@@ -6,17 +6,6 @@ from izaber import initialize
 from izaber.wamp import wamp
 import swampyer
 
-
-IZABER_TEMPLATE = """
-default:
-  wamp:
-    connection:
-      url: 'ws://localhost:8282/ws'
-      username: '{username}'
-      password: '{password}'
-
-"""
-
 def test_connect():
     snapshot_data = load_nexus_db()
     users = snapshot_data['users']
@@ -27,8 +16,8 @@ def test_connect():
 
     # Do a valid connection
     client = swampyer.WAMPClientTicket(
-                url="ws://localhost:8282/ws",
-                realm="izaber",
+                url=NEXUS_URL,
+                realm=NEXUS_REALM,
                 username=username,
                 password=password,
             ).start()

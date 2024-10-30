@@ -82,8 +82,8 @@ class WAMPClientTicket(swampyer.WAMPClientTicket):
     def apikeys_list(self):
         return self.call('my.apikeys.list')
 
-    def apikeys_delete(self, meta_key):
-        return self.call('my.apikeys.delete', meta_key)
+    def apikeys_delete(self, uuid_b64):
+        return self.call('my.apikeys.delete', uuid_b64)
 
     ################################################################
     # OTP

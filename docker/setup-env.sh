@@ -6,8 +6,7 @@ ROOT_PATH=$(dirname $(readlink -f $0))
 export PATH="/home/zaber/.local/bin:$PATH"
 cd /src
 
-# We sometimes need to upgrade
-poetry update
+curl -sSL https://pdm-project.org/install-pdm.py | python3 -
 
-# Now do the install process for the library
-poetry install
+pdm install -d
+

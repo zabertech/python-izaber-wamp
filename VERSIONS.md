@@ -25,3 +25,14 @@
   - Rosters
   - Changing the current WAMP user with new authentication keys
   - Creating a new WAMP session with new keys
+
+## 3.0.20241025
+
+Unreleased version as there were no code changes but repo refactoring.
+
+1. Minimum python version now 3.8
+2. Moving to [PDM](https://pdm-project.org/en/latest/) for package management
+3. Moving to [Docker Compose](https://docs.docker.com/compose/) do separate out nexus container
+
+
+

@@ -11,17 +11,6 @@ from lib import *
 from izaber import initialize
 from izaber_wamp import wamp
 
-IZABER_TEMPLATE = """
-default:
-  wamp:
-    connection:
-      url: 'ws://localhost:8282/ws'
-      username: '{username}'
-      password: '{password}'
-
-"""
-
-
 def test_rosters():
     snapshot_data = load_nexus_db()
     users = snapshot_data['users']
