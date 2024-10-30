@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-from lib import *
+from .utils import *
 
 from izaber import initialize
 from izaber_wamp import wamp, wamp_client_subclass, WAMPClientTicket

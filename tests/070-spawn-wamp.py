@@ -6,7 +6,7 @@ within the izaber context
 """
 
 import os
-from lib import *
+from .utils import *
 
 from izaber import initialize
 from izaber_wamp import wamp, wamp_client_subclass

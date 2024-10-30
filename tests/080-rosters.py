@@ -6,7 +6,7 @@ This tests if we can easily manipulate metadata
 
 import os
 import random
-from lib import *
+from .utils import *
 
 from izaber import initialize
 from izaber_wamp import wamp

@@ -6,7 +6,7 @@ user on WAMP
 """
 
 import os
-from lib import *
+from .utils import *
 
 from izaber import initialize
 from izaber_wamp import wamp

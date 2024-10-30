@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-from lib import *
+from .utils import *
 
 from izaber import initialize
 from izaber.wamp import wamp
